@@ -1,7 +1,129 @@
 # [CS61A: Structure and Interpretation of Computer Programs](https://cs61a.org/)
 
-###### TODO: Lab02、Homework02、Hog | 学习到 week03-9/9
+###### TODO:
+```
+cs61a: Hog | point 9/9
+```
 
+## week2: 9/6
+
+### Homework 2: Higher-Order Functions
+
+#### Q1: Product
+目的：求式子term前n项和 
+
+---
+
+Write a function called product that returns the product of the first n terms of a sequence. Specifically, product takes in an integer n and term, a single-argument function that determines a sequence. (That is, term(i) gives the ith term of the sequence.) product(n, term) should return term(1) * ... * term(n).
+```python
+def product(n, term):
+    """Return the product of the first n terms in a sequence.
+
+    n: a positive integer
+    term:  a function that takes one argument to produce the term
+
+    >>> product(3, identity)  # 1 * 2 * 3
+    6
+    >>> product(5, identity)  # 1 * 2 * 3 * 4 * 5
+    120
+    >>> product(3, square)    # 1^2 * 2^2 * 3^2
+    36
+    >>> product(5, square)    # 1^2 * 2^2 * 3^2 * 4^2 * 5^2
+    14400
+    >>> product(3, increment) # (1+1) * (2+1) * (3+1)
+    24
+    >>> product(3, triple)    # 1*3 * 2*3 * 3*3
+    162
+    """
+    "*** YOUR CODE HERE ***"
+```
+```python
+    i = 1
+    result = 1
+    while i <= n:
+        result *= term(i)
+        i += 1
+    return result
+```
+
+#### Q2: Accumulate    
+目的： fuse(乘/加)start和式子term的前n项
+
+---
+
+Let's take a look at how product is an instance of a more general function called accumulate, which we would like to implement:
+```python
+def accumulate(fuse, start, n, term):
+    """Return the result of fusing together the first n terms in a sequence
+    and start.  The terms to be fused are term(1), term(2), ..., term(n).
+    The function fuse is a two-argument commutative & associative function.
+
+    >>> accumulate(add, 0, 5, identity)  # 0 + 1 + 2 + 3 + 4 + 5
+    15
+    >>> accumulate(add, 11, 5, identity) # 11 + 1 + 2 + 3 + 4 + 5
+    26
+    >>> accumulate(add, 11, 0, identity) # 11 (fuse is never used)
+    11
+    >>> accumulate(add, 11, 3, square)   # 11 + 1^2 + 2^2 + 3^2
+    25
+    >>> accumulate(mul, 2, 3, square)    # 2 * 1^2 * 2^2 * 3^2
+    72
+    >>> # 2 + (1^2 + 1) + (2^2 + 1) + (3^2 + 1)
+    >>> accumulate(lambda x, y: x + y + 1, 2, 3, square)
+    19
+    """
+    # fuse(乘/加)start和式子term的前n项
+    i = 1
+    result = start
+    while i <= n:
+        temp = term(i)
+        result = fuse(result, temp)
+        i += 1
+    return result
+
+```
+accumulate has the following parameters:
+
+- fuse: a two-argument function that specifies how the current term is fused with the previously accumulated terms
+- start: value at which to start the accumulation
+- n: a non-negative integer indicating the number of terms to fuse
+- term: a single-argument function; term(i) is the ith term of the sequence
+
+Implement accumulate, which fuses the first n terms of the sequence defined by term with the start value using the fuse function.
+
+#### Q3: Make Repeater
+
+目的：返回一个函数，实现f(...f(x)...)，嵌套次数取决于n的大小
+
+---
+Implement the function make_repeater which takes a one-argument function f and a positive integer n. It returns a one-argument function, where make_repeater(f, n)(x) returns the value of f(f(...f(x)...)) in which f is applied n times to x. For example, make_repeater(square, 3)(5) squares 5 three times and returns 390625, just like square(square(square(5))).
+
+```python
+def make_repeater(f, n):
+    """Returns the function that computes the nth application of f.
+
+    >>> add_three = make_repeater(increment, 3)
+    >>> add_three(5)
+    8
+    >>> make_repeater(triple, 5)(1) # 3 * (3 * (3 * (3 * (3 * 1))))
+    243
+    >>> make_repeater(square, 2)(5) # square(square(5))
+    625
+    >>> make_repeater(square, 3)(5) # square(square(square(5)))
+    390625
+    """
+    "*** YOUR CODE HERE ***"
+```
+```python
+   def g(x):
+       m = n
+       result = x
+       while m > 0:
+           result = f(result)
+           m -= 1
+       return result
+   return g
+```
 ## week3: 9/9
 
 ### Lab02: Higher-Order Functions, Lambda Expressions
